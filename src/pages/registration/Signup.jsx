@@ -1,133 +1,153 @@
-import { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import myContext from '../../context/data/myContext';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendEmailVerification, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, fireDB } from '../../fireabase/FirebaseConfig';
 import { Timestamp, addDoc, collection } from 'firebase/firestore';
-import Loader from '../../components/loader/Loader';
 
-function Signup() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+const Signup = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const context = useContext(myContext);
-    const { loading, setLoading } = context;
-    const navigate = useNavigate();
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    const signup = async () => {
-        setLoading(true);
-        if (name === "" || email === "" || password === "") {
-            toast.error("All fields are required");
-            setLoading(false);
-            return;
-        }
+    // Input validation
+    if (!name || !email || !password) {
+      toast.error('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
 
-        try {
-            const users = await createUserWithEmailAndPassword(auth, email, password);
-            console.log(users);
+    try {
+      // Create user
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Send verification email
+      await sendEmailVerification(userCredential.user);
 
-            await sendEmailVerification(users.user); // Send email verification
+      // Store user data in Firestore
+      const userData = {
+        name,
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        createdAt: Timestamp.now()
+      };
 
-            const user = {
-                name: name,
-                uid: users.user.uid,
-                email: users.user.email,
-                time: Timestamp.now()
-            };
-            const userRef = collection(fireDB, "users");
-            await addDoc(userRef, user);
-            toast.success("Signup Successfully. Please verify your email.");
-            setName("");
-            setEmail("");
-            setPassword("");
-            navigate('/login');
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            toast.error("Signup Failed");
-            setLoading(false);
-        }
-    };
+      await addDoc(collection(fireDB, 'users'), userData);
 
-    const googleSignup = async () => {
-        setLoading(true);
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = {
-                name: result.user.displayName,
-                uid: result.user.uid,
-                email: result.user.email,
-                time: Timestamp.now()
-            };
-            const userRef = collection(fireDB, "users");
-            await addDoc(userRef, user);
-            toast.success("Signup Successfully");
-            setLoading(false);
-            navigate('/login'); // Redirect to home page
-        } catch (error) {
-            console.log(error);
-            toast.error("Google Signup Failed");
-            setLoading(false);
-        }
-    };
+      // Success notifications and navigation
+      toast.success('Sign up successful! Please verify your email.');
+      navigate('/login');
+    } catch (error) {
+      // Error handling
+      const errorMessage = error.code === 'auth/email-already-in-use' 
+        ? 'Email already exists' 
+        : 'Sign up failed. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className='flex justify-center items-center h-screen'>
-            {loading && <Loader />}
-            <div className='bg-gray-800 px-10 py-10 rounded-xl'>
-                <div className="">
-                    <h1 className='text-center text-white text-xl mb-4 font-bold'>Signup</h1>
-                </div>
-                <div>
-                    <input type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        name='name'
-                        className='bg-gray-600 mb-4 px-2 py-2 w-full lg:w-[20em] rounded-lg text-white placeholder:text-gray-200 outline-none'
-                        placeholder='Name'
-                    />
-                </div>
-                <div>
-                    <input type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        name='email'
-                        className='bg-gray-600 mb-4 px-2 py-2 w-full lg:w-[20em] rounded-lg text-white placeholder:text-gray-200 outline-none'
-                        placeholder='Email'
-                    />
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className='bg-gray-600 mb-4 px-2 py-2 w-full lg:w-[20em] rounded-lg text-white placeholder:text-gray-200 outline-none'
-                        placeholder='Password'
-                    />
-                </div>
-                <div className='flex justify-center mb-3'>
-                    <button
-                        onClick={signup}
-                        className='bg-red-500 w-full text-white font-bold px-2 py-2 rounded-lg'>
-                        Signup
-                    </button>
-                </div>
-                <div className='flex justify-center mb-3'>
-                    <button
-                        onClick={googleSignup}
-                        className='bg-blue-500 w-full text-white font-bold px-2 py-2 rounded-lg'>
-                        Signup with Google
-                    </button>
-                </div>
-                <div>
-                    <h2 className='text-white'>Have an account <Link className='text-red-500 font-bold' to={'/login'}>Login</Link></h2>
-                </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gray-100">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center filter brightness-50 z-0"
+        style={{
+          backgroundImage: `url("Untitled design (13).png")`
+        }}
+      />
+      
+      <div className="relative z-20 w-full left-60 max-w-lg px-0">
+        <form 
+          onSubmit={handleSignup} 
+          className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl px-8 pt-6 pb-8 mb-4"
+        >
+          {/* Logo */}
+          <div className="flex justify-center -mb-6 -mt-3">
+            <div className="w-40 h-40 flex items-center justify-center">
+              <span className="text-white text-4xl font-bold"><img src="Untitled design (14).png" alt="" /></span>
             </div>
-        </div>
-    );
-}
+          </div>
+          
+          <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-7">
+            Create Your Account
+          </h2>
+          
+          <div className="mb-4">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full Name"
+              required
+              className="w-full px-3 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+            />
+          </div>
+          
+          <div className="mb-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              required
+              className="w-full px-3 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+            />
+          </div>
+          
+          <div className="mb-6 relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              minLength={6}
+              className="w-full px-3 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-4 text-gray-400 hover:text-gray-600 transition"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+          
+          <div className="mb-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-50"
+            >
+              {loading ? "Signing Up..." : "Sign Up"}
+            </button>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-gray-600 mt-4 text-sm">
+              Already have an account? {" "}
+              <Link 
+                to="/login" 
+                className="text-blue-600 hover:text-blue-800 font-semibold transition duration-300"
+              >
+                Log In
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export default Signup;

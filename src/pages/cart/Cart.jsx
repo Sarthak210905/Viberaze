@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteFromCart } from "../../redux/cartSlice";
 import { toast } from "react-toastify";
 import { addDoc, collection } from "firebase/firestore";
-import { fireDB } from "../../fireabase/FirebaseConfig";
+import { fireDB , auth } from "../../fireabase/FirebaseConfig";
 import { TrashIcon, ShoppingCartIcon, MinusIcon } from "lucide-react";
 
 function Cart() {
@@ -81,6 +81,12 @@ function Cart() {
   };
 
   const handleBuyNow = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      toast.error("Please login to buy items");
+      return;
+    }
+
     // Validate form data first
     if (
       !formData.name ||
@@ -249,8 +255,16 @@ function Cart() {
                         </div>
                         <div className="flex justify-between items-center mt-4">
                           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                            ₹{item.price * item.quantity}
+                            ₹{item.salePrice ? item.salePrice * item.quantity : item.price * item.quantity}
                           </p>
+                          {item.salePrice && (
+                            <p className="text-gray-500 line-through">
+                              ₹{item.price * item.quantity}
+                            </p>
+                          )}
+                          {item.stock === 0 && (
+                            <p className="text-red-500">Out of Stock</p>
+                          )}
                         </div>
                       </div>
                     </div>

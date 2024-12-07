@@ -95,9 +95,18 @@ const OrderCard = ({ order, mode }) => {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Size: {item.size} | Quantity: {item.quantity}
                 </p>
-                <p className="font-semibold mt-1">
-                  ₹{item.price * item.quantity}
-                </p>
+                {item.salePrice ? (
+                  <p className="font-semibold mt-1">
+                    Sale Price: ₹{item.salePrice * item.quantity}
+                  </p>
+                ) : (
+                  <p className="font-semibold mt-1">
+                    ₹{item.price * item.quantity}
+                  </p>
+                )}
+                {item.stock === 0 && (
+                  <p className="text-red-500">Out of Stock</p>
+                )}
               </div>
             </div>
           ))}

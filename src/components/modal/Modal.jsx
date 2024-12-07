@@ -1,7 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { toast } from "react-toastify"; // Add this import
-import { auth } from "../../fireabase/FirebaseConfig"; // Add this import
+import { auth, fireDB } from "../../fireabase/FirebaseConfig"; // Corrected import path
+import { User } from "lucide-react";
 
 export default function Modal({
   name,
@@ -138,13 +139,10 @@ export default function Modal({
                           </form>
                           <button
                             onClick={() => {
-                              if (auth.isAuthent) {
+                             
                                 buyNow();
                                 closeModal();
-                              }
-                              else {
-                                toast.error("You must be logged in");
-                              }
+                              
                             }}
                             type="button"
                             className="focus:outline-none w-full text-white bg-violet-600 hover:bg-violet-800  outline-0 font-medium rounded-lg text-sm px-5 py-2.5 "

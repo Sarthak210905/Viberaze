@@ -68,14 +68,13 @@ function Navbar() {
                   </button>
                 </div>
                 <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                <Link
+                  <Link
                     to={"/men"}
                     className="text-sm font-medium text-gray-700 "
                     style={{ color: mode === "dark" ? "white" : "" }}
                   >
-                   Men
+                    Men
                   </Link>{" "}
-                
                   <Link
                     to={"/women"}
                     className="text-sm font-medium text-gray-700 "
@@ -96,7 +95,6 @@ function Navbar() {
                   ) : (
                     ""
                   )}
-
                   {user?.user?.email === "sarthakchoukse2109@gmail.com" ? (
                     <div className="flow-root">
                       <Link
@@ -110,7 +108,6 @@ function Navbar() {
                   ) : (
                     "/dashboard"
                   )}
-
                   {user ? (
                     <div className="flow-root">
                       <a
@@ -215,15 +212,13 @@ function Navbar() {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                
                   <Link
                     to={"/men"}
                     className="text-sm font-medium text-gray-700 "
                     style={{ color: mode === "dark" ? "white" : "" }}
                   >
-                   Men
+                    Men
                   </Link>{" "}
-                
                   <Link
                     to={"/women"}
                     className="text-sm font-medium text-gray-700 "

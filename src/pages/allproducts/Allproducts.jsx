@@ -52,7 +52,17 @@ function Allproducts() {
                                         <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>Viberaze</h2>
                                         <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
                                         {/* <p className="leading-relaxed mb-3">{item.description.}</p> */}
-                                        <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹{price}</p>
+                                        <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                          ₹{item.salePrice ? item.salePrice : item.price}
+                                        </p>
+                                        {item.salePrice && (
+                                          <p className="leading-relaxed mb-3 text-gray-500 line-through" style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                            ₹{item.price}
+                                          </p>
+                                        )}
+                                        {item.stock === 0 && (
+                                          <p className="text-red-500">Out of Stock</p>
+                                        )}
                                         <div className=" flex justify-center">
                                             <button type="button" 
                                             onClick={()=> addCart(item)}

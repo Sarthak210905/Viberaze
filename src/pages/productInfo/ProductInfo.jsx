@@ -197,9 +197,14 @@ const ProductInfo = () => {
 
                   {/* Price */}
                   <div className="mt-6">
-                    <p className="text-4xl font-bold text-gray-900">₹{products.price}</p>
-                    {products.oldPrice && (
-                      <p className="mt-1 text-gray-500 line-through">₹{products.oldPrice}</p>
+                    <p className="text-4xl font-bold text-gray-900">
+                      ₹{products.salePrice ? products.salePrice : products.price}
+                    </p>
+                    {products.salePrice && (
+                      <p className="mt-1 text-gray-500 line-through">₹{products.price}</p>
+                    )}
+                    {products.stock === 0 && (
+                      <p className="text-red-500">Out of Stock</p>
                     )}
                   </div>
 

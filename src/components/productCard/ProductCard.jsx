@@ -77,6 +77,10 @@ function ProductCard() {
                                                 style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }}
                                             >
                                                 <option value="">Select size</option>
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
                                                 {size && size.split(',').map((s, i) => (
                                                     <option key={i} value={s}>{s}</option>
                                                 ))}
