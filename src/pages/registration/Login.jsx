@@ -4,6 +4,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../fireabase/FirebaseConfig";
 import { toast } from "react-toastify";
 import myContext from "../../context/data/myContext";
+import Navbar from "../../components/navbar/Navbar";
+import Footer from "../../components/footer/Footer";
 
 const Login = () => {
   const { loading, setLoading } = useContext(myContext);
@@ -38,72 +40,77 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center  relative overflow-hidden bg-gray-100">
+    <>
+    <Navbar />
+    <div className="min-h-screen flex items-center -mt-10 justify-center relative overflow-hidden bg-gray-100">
       {/* Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center filter brightness-00 z-0"
+        className="absolute inset-0 bg-cover bg-center filter brightness-50 z-0"
         style={{
-          backgroundImage: `url("Untitled design (13).png")`
+          backgroundImage: `url("NEW (1).png")`
         }}
       />
       
-      <div className="relative z-20 w-full left-60 max-w-lg px-0">
+      <div className="w-250 relative z-20 w-full max-w-lg px-4 sm:px-6 lg:px-8 mx-auto">
         <form 
           onSubmit={handleLogin} 
-          className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl px-8 pt-6 pb-8 mb-4"
+          className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl px-6 sm:px-8 pt-6 pb-8 mb-4 w-full space-y-4"
+          
         >
           {/* Logo */}
-          <div className="flex justify-center -mb-6 -mt-3">
-            <div className="w-40 h-40 flex items-center justify-center ">
-              <span className="text-white text-4xl font-bold"><img src="Untitled design (14).png" alt="" /></span>
-            </div>
+          <div className="flex justify-center -mb-10">
+            <img 
+              src="Untitled design (14).png" 
+              alt="Logo" 
+              className="w-32 h-32 object-contain"
+            />
           </div>
           
-          <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-7">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-gray-800 mb-6">
             Welcome Back
           </h2>
           
-          <div className="mb-4">
+          <div>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               required
-              className="w-full px-3 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+              className="w-full px-3 py-2 sm:py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
             />
           </div>
           
-          <div className="mb-6">
+          <div>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               required
-              className="w-full px-3 py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+              className="w-full px-3 py-2 sm:py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
             />
           </div>
           
-          <div className="mb-6">
+          <div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-50"
+              className="w-full bg-blue-600 text-white py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-[1.02] disabled:opacity-50"
             >
               {loading ? "Logging in..." : "Sign In"}
             </button>
           </div>
           
-          <div className="text-center">
+          <div className="text-center space-y-4">
             <Link 
               to="/forgot" 
-              className="text-blue-600 hover:text-blue-800 text-sm transition duration-300"
+              className="text-blue-600 hover:text-blue-800 text-sm transition duration-300 block"
             >
               Forgot Password?
             </Link>
             
-            <p className="text-gray-600 mt-4 text-sm">
+            <p className="text-gray-600 text-sm">
               Don't have an account? {" "}
               <Link 
                 to="/signup" 
@@ -116,6 +123,8 @@ const Login = () => {
         </form>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 
