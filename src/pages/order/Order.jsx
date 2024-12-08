@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useDispatch } from "react-redux";
-import { PlaceOrder } from "../../redux/status";
+import { PlaceOrder, UpdateOrderStatus } from "../../redux/status"; // Import UpdateOrderStatus action
 import myContext from "../../context/data/myContext";
 import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
@@ -49,8 +49,8 @@ const OrderStatus = ({ status }) => {
   );
 };
 
-const OrderCard = ({ order, mode }) => {
-  const date = new Date(order.date);
+const OrderCard = ({ order, mode, onUpdateStatus }) => {
+  const date = order.date?.seconds ? new Date(order.date.seconds * 1000) : new Date(order.date); // Fix date parsing
   const formattedDate = date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -153,7 +153,7 @@ const OrderCard = ({ order, mode }) => {
   );
 };
 
-const OrderList = ({ orders, mode }) => (
+const OrderList = ({ orders, mode, onUpdateStatus }) => (
   <div className="max-w-4xl mx-auto px-4 py-8">
     <h1
       className="text-2xl font-bold mb-6"
@@ -163,7 +163,7 @@ const OrderList = ({ orders, mode }) => (
     </h1>
     <div className="space-y-6">
       {orders.map((order, index) => (
-        <OrderCard key={index} order={order} mode={mode} />
+        <OrderCard key={index} order={order} mode={mode} onUpdateStatus={onUpdateStatus} />
       ))}
     </div>
   </div>
@@ -185,6 +185,10 @@ const Order = () => {
     dispatch(PlaceOrder(newOrder));
   };
 
+  const handleUpdateStatus = (orderId, status) => {
+    dispatch(UpdateOrderStatus({ orderId, status }));
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -204,28 +208,23 @@ const Order = () => {
           <p className="mt-2 text-gray-500 dark:text-gray-400 text-center">
             When you make a purchase, your orders will appear here
           </p>
-          <button
-            onClick={handlePlaceOrder}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Place Order
-          </button>
+
         </div>
       </Layout>
     );
-  }
+  };
 
   const userOrders = orders.filter((obj) => obj.userid === userId);
 
   return (
     <Layout>
-      <OrderList orders={userOrders} mode={mode} />
+      <OrderList orders={userOrders} mode={mode} onUpdateStatus={handleUpdateStatus} />
       <div className="flex justify-center mt-6">
         <button
           onClick={handlePlaceOrder}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="px-4 py-2 text-white rounded"
         >
-          Place Order
+          
         </button>
       </div>
     </Layout>
