@@ -28,6 +28,7 @@ import Women from './genders/women';
 import Terms from './pages/extra/terms';
 import Cancel from './pages/extra/cancel';
 import ContactUs from './pages/extra/contactus';
+import ShippingPolicy from './pages/extra/shipping';
 function App() {
   return (
     <MyState>
@@ -39,7 +40,7 @@ function App() {
           <Route path="/contact" element={<ContactUs/>} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/about" element={<AboutUs />} />
+          <Route path="/shippingpolicy" element={<ShippingPolicy />} />
           <Route path="/allproducts" element={<Allproducts />} />
           <Route path="/men" element={<Men/>} />
           <Route path="/women" element={<Women/>} />

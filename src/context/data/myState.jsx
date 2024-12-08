@@ -139,7 +139,7 @@ function myState(props) {
     }
 
 
-    const [order, setOrder] = useState([]);
+    const [orders, setOrders] = useState([]); // Initialize as empty array
 
     const getOrderData = async () => {
         setLoading(true)
@@ -150,7 +150,7 @@ function myState(props) {
                 ordersArray.push(doc.data());
                 setLoading(false)
             });
-            setOrder(ordersArray);
+            setOrders(ordersArray);
             console.log(ordersArray)
             setLoading(false);
         } catch (error) {
@@ -192,7 +192,7 @@ function myState(props) {
         <MyContext.Provider value={{
             mode, toggleMode, loading, setLoading,
             products, setProducts, addProduct, product,
-            edithandle, updateProduct, deleteProduct, order,
+            edithandle, updateProduct, deleteProduct, orders,
             user, searchkey, setSearchkey,filterType,setFilterType,
             filterPrice,setFilterPrice
         }}>
@@ -201,4 +201,4 @@ function myState(props) {
     )
 }
 
-export default myState
+export default myState;

@@ -7,7 +7,7 @@ function Footer() {
   const { mode } = context;
   return (
     <div>
-      <footer className="text-gray-600 body-font bg-gray-10" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }}>
+      <footer className="text-gray-600 body-font bg-gray-100" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }}>
         <div className="container px-5 py-24 mx-auto" >
           <div className="flex flex-wrap md:text-left text-center order-first">
             <div className="lg:w-1/4 md:w-1/2 w-full px-4">
@@ -47,6 +47,10 @@ function Footer() {
                 </li> 
                   <li>
                   <Link to={'/terms'} className="text-gray-600 hover:text-gray-800" style={{ color: mode === 'dark' ? 'white' : '' }}>Terms & Conditions</Link>
+                </li>
+ 
+                  <li>
+                  <Link to={'/shippingpolicy'} className="text-gray-600 hover:text-gray-800" style={{ color: mode === 'dark' ? 'white' : '' }}>Shipping Policy</Link>
                 </li>
 
               </nav>

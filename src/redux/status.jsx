@@ -1,6 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = JSON.parse(localStorage.getItem('status')) ?? [];
+const initialState = (() => {
+    try {
+        return JSON.parse(localStorage.getItem('status')) ?? [];
+    } catch {
+        return [];
+    }
+})();
 
 const Deliverystatus = createSlice({
     name: 'status',
@@ -16,10 +22,24 @@ const Deliverystatus = createSlice({
                 state[index] = action.payload;
                 localStorage.setItem('status', JSON.stringify(state));
             }
+        },
+        UpdateShippingStatus(state, action) {
+            const index = state.findIndex(order => order.id === action.payload.id);
+            if (index !== -1) {
+                state[index].shippingStatus = action.payload.shippingStatus;
+                localStorage.setItem('status', JSON.stringify(state));
+            }
+        },
+        LoadOrderHistory(state) {
+            return JSON.parse(localStorage.getItem('status')) ?? [];
+        },
+        PlaceOrder(state, action) {
+            state.push(action.payload);
+            localStorage.setItem('status', JSON.stringify(state));
         }
     }
 });
 
-export const { OrderStatus, UpdateOrderStatus } = Deliverystatus.actions;
+export const { OrderStatus, UpdateOrderStatus, LoadOrderHistory, PlaceOrder, UpdateShippingStatus } = Deliverystatus.actions;
 
 export default Deliverystatus.reducer;

@@ -1,4 +1,6 @@
 import React, { useContext } from "react";
+import { useDispatch } from "react-redux";
+import { PlaceOrder } from "../../redux/status";
 import myContext from "../../context/data/myContext";
 import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
@@ -170,7 +172,18 @@ const OrderList = ({ orders, mode }) => (
 const Order = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?.user?.uid;
-  const { mode, loading, orders } = useContext(myContext); // Changed 'order' to 'orders'
+  const { mode, loading, orders } = useContext(myContext);
+  const dispatch = useDispatch();
+
+  const handlePlaceOrder = () => {
+    const newOrder = {
+      id: Date.now(),
+      userid: userId,
+      status: "processing",
+      // Add other necessary order details here
+    };
+    dispatch(PlaceOrder(newOrder));
+  };
 
   if (loading) {
     return (
@@ -180,7 +193,7 @@ const Order = () => {
     );
   }
 
-  if (!orders || orders.length === 0) { // Changed 'order' to 'orders'
+  if (!Array.isArray(orders) || orders.length === 0) {
     return (
       <Layout>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -191,16 +204,30 @@ const Order = () => {
           <p className="mt-2 text-gray-500 dark:text-gray-400 text-center">
             When you make a purchase, your orders will appear here
           </p>
+          <button
+            onClick={handlePlaceOrder}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Place Order
+          </button>
         </div>
       </Layout>
     );
   }
 
-  const userOrders = orders.filter((obj) => obj.userid === userId); // Changed 'order' to 'orders'
+  const userOrders = orders.filter((obj) => obj.userid === userId);
 
   return (
     <Layout>
       <OrderList orders={userOrders} mode={mode} />
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={handlePlaceOrder}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Place Order
+        </button>
+      </div>
     </Layout>
   );
 };

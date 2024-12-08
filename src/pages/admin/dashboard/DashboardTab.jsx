@@ -10,13 +10,13 @@ import { UpdateOrderStatus } from '../../../redux/status';
 
 function DashboardTab() {
     const context = useContext(myContext);
-    const { mode, product, edithandle, deleteProduct, order, user } = context;
+    const { mode, product, edithandle, deleteProduct, orders, user } = context; // Use orders instead of order
     const dispatch = useDispatch();
     
     const handleAddProduct = () => {
         window.location.href = '/addproduct';
     }
-        const addresses = order.reduce((acc, curr) => {
+    const addresses = orders?.reduce((acc, curr) => { // Use orders instead of order
         if (curr.addressInfo && typeof curr.addressInfo === 'object') {
             const address = {
                 name: curr.addressInfo.name,
@@ -40,7 +40,7 @@ function DashboardTab() {
     }, []);
 
     const updateOrderStatus = (paymentId, status) => {
-        const updatedOrder = order.find(o => o.paymentId === paymentId);
+        const updatedOrder = orders.find(o => o.paymentId === paymentId); // Use orders instead of order
         if (updatedOrder) {
             updatedOrder.status = status;
             dispatch(UpdateOrderStatus(updatedOrder));
@@ -140,60 +140,64 @@ function DashboardTab() {
                 <TabPanel>
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-bold mb-6">Order Details</h2>
-                        {order.map((allorder, index) => (
-                            <div key={index} className="mb-8">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Info</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {allorder.cartItems.map((item, itemIndex) => (
-                                            <tr key={itemIndex}>
-                                                <td className="px-6 py-4 whitespace-nowrap">{allorder.paymentId}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <img 
-                                                        src={item.imageUrls[0]} 
-                                                        alt={item.title}
-                                                        className="w-16 h-16 object-cover rounded"
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap">₹{item.price}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap">{item.category}</td>
-                                                <td className="px-6 py-4">
-                                                    <div className="space-y-1">
-                                                        <p className="text-sm text-gray-500">{allorder.addressInfo}</p>
-                                                        <p className="text-sm text-gray-500">{allorder.phoneNumber}</p>
-                                                        <p className="text-sm text-gray-500">{allorder.email}</p>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">{allorder.date}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <select 
-                                                        value={allorder.status} 
-                                                        onChange={(e) => updateOrderStatus(allorder.paymentId, e.target.value)}
-                                                        className="border border-gray-300 rounded p-2"
-                                                    >
-                                                        <option value="processing">Processing</option>
-                                                        <option value="shipped">Shipped</option>
-                                                        <option value="delivered">Delivered</option>
-                                                    </select>
-                                                </td>
+                        {orders && orders.length > 0 ? ( // Use orders instead of order
+                            orders.map((allorder, index) => ( // Use orders instead of order
+                                <div key={index} className="mb-8">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Info</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ))}
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {allorder.cartItems.map((item, itemIndex) => (
+                                                <tr key={itemIndex}>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{allorder.paymentId}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <img 
+                                                            src={item.imageUrls[0]} 
+                                                            alt={item.title}
+                                                            className="w-16 h-16 object-cover rounded"
+                                                        />
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">₹{item.price}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{item.category}</td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="space-y-1">
+                                                            <p className="text-sm text-gray-500">{allorder.addressInfo}</p>
+                                                            <p className="text-sm text-gray-500">{allorder.phoneNumber}</p>
+                                                            <p className="text-sm text-gray-500">{allorder.email}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{allorder.date}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <select 
+                                                            value={allorder.status} 
+                                                            onChange={(e) => updateOrderStatus(allorder.paymentId, e.target.value)}
+                                                            className="border border-gray-300 rounded p-2"
+                                                        >
+                                                            <option value="processing">Processing</option>
+                                                            <option value="shipped">Shipped</option>
+                                                            <option value="delivered">Delivered</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-500">No orders available.</p>
+                        )}
                     </div>
                 </TabPanel>
 

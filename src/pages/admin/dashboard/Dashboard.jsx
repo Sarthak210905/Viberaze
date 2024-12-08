@@ -3,36 +3,47 @@ import { FaUserTie, FaShoppingBag, FaShoppingCart, FaUsers } from 'react-icons/f
 import Layout from '../../../components/layout/Layout';
 import DashboardTab from './DashboardTab';
 import myContext from '../../../context/data/myContext';
+import { useDispatch } from 'react-redux';
+import { UpdateShippingStatus} from '../../../redux/status';
 
 function Dashboard() {
-  const context = useContext(myContext)
-  const { mode, product, order, user } = context
+  const context = useContext(myContext);
+  const { mode, product, order, user } = context;
+  const dispatch = useDispatch();
 
-  // Calculate total revenue
-  const totalRevenue = order.reduce((acc, curr) => {
+  const handleUpdateShippingStatus = (orderId, newStatus) => {
+    dispatch(UpdateShippingStatus({ id: orderId, shippingStatus: newStatus }));
+  };
+
+  const handleUpdateDeliveryStatus = (orderId, newStatus) => {
+    dispatch(UpdateDeliveryStatus({ id: orderId, deliveryStatus: newStatus }));
+  };
+
+  // Ensure order is defined before using reduce
+  const totalRevenue = order?.reduce((acc, curr) => {
     return acc + curr.cartItems.reduce((itemAcc, item) => {
-      return itemAcc + (item.price * item.quantity)
-    }, 0)
-  }, 0)
+      return itemAcc + (item.price * item.quantity);
+    }, 0);
+  }, 0) || 0;
 
   const dashboardStats = [
     {
       icon: <FaShoppingBag size={40} />,
       title: "Total Products",
-      value: product.length,
+      value: product?.length || 0,
       color: "from-pink-500 to-rose-500"
     },
     {
       icon: <FaShoppingCart size={40} />,
       title: "Total Orders",
-      value: order.length,
+      value: order?.length || 0,
       color: "from-purple-500 to-indigo-500"
     },
     {
       icon: <FaUsers size={40} />,
       title: "Total Users",
-      value: user.length,
-      color: "from-cyan-500 to-blue-500"  
+      value: user?.length || 0,
+      color: "from-cyan-500 to-blue-500"
     },
     {
       icon: <FaUserTie size={40} />,
