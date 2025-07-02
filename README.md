@@ -1,6 +1,6 @@
 # Viberaze - Complete Ecommerce Platform
 
-A modern, full-featured ecommerce website built with React, Firebase, and Tailwind CSS. Viberaze is a comprehensive online shopping platform with all the essential features needed for a production-ready ecommerce business.
+A modern, full-featured ecommerce website built with React, Firebase, and Tailwind CSS. Viberaze is a comprehensive online shopping platform with all the essential features needed for a production-ready ecommerce business. It includes user authentication, product management, shopping cart functionality, payment integration, and an admin dashboard for managing products and orders.
 
 ## 🚀 Features
 
