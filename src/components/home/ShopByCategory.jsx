@@ -3,7 +3,7 @@ import React from 'react'
 const categories = [
   { name: 'Men', image: '/mens.png' },
   { name: 'Women', image: '/women.png' },
-  { name: 'Accessories', image: '/public/Untitled design (14).png' },
+  { name: 'Accessories', image: './Untitled design (14).png' },
 ]
 
 const ShopByCategory = () => (
