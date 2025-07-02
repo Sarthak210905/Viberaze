@@ -1,31 +1,40 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { Heart, ShoppingCart, Eye, Star } from 'lucide-react'
 import myContext from '../../context/data/myContext'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../redux/cartSlice'
+import { toggleWishlistItem } from '../../redux/wishlistSlice'
 import { toast } from 'react-toastify'
+import { Link } from 'react-router-dom'
 
 function ProductCard() {
     const context = useContext(myContext)
-    const { mode, product ,searchkey, setSearchkey,filterType,setFilterType,
-        filterPrice,setFilterPrice} = context
+    const { mode, product, searchkey, filterType, filterPrice } = context
 
     const dispatch = useDispatch()
-    const cartItems = useSelector((state)=> state.cart);
+    const cartItems = useSelector((state) => state.cart.items);
+    const wishlistItems = useSelector((state) => state.wishlist.items);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedColor, setSelectedColor] = useState('');
 
-    const addCart = (product)=> {
+    const addCartHandler = (product) => {
         if (!selectedSize) {
             toast.error('Please select a size');
             return;
         }
-        dispatch(addToCart({ ...product, size: selectedSize, price:product.price , quantity: 1 , color: selectedColor }));
-        toast.success('add to cart');
+        if (!selectedColor) {
+            toast.error('Please select a color');
+            return;
+        }
+        dispatch(addToCart({ ...product, size: selectedSize, color: selectedColor }));
+        toast.success('Added to cart');
     }
 
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems])
+    const handleToggleWishlist = (item) => {
+        dispatch(toggleWishlistItem(item));
+    };
+
+    const isInWishlist = (productId) => wishlistItems.some(item => item.id === productId);
 
     return (
         <section className="text-gray-600 body-font">
@@ -34,62 +43,130 @@ function ProductCard() {
                     <h1 className="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900" style={{ color: mode === 'dark' ? 'white' : '' }}>New Arrivals</h1>
                     <div className="h-1 w-20 bg-pink-600 rounded"></div>
                 </div>
-                <div className="flex flex-wrap -m-4">
-                    {product.filter((obj)=> obj.title.toLowerCase().includes(searchkey))
-                     .filter((obj) => obj.category.toLowerCase().includes(filterType))
-                     .filter((obj) => obj.price.includes(filterPrice)).map((item, index) => {
-                        const { title, price, description, imageUrls, id, size, colors } = item;
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {product
+                     .filter((obj) => obj.title.toLowerCase().includes(searchkey))
+                     .filter((obj) => {
+                        if (Array.isArray(obj.category)) {
+                            return obj.category.some(c => typeof c === 'string' && c.toLowerCase().includes(filterType));
+                        } else {
+                            return obj.category?.toLowerCase().includes(filterType);
+                        }
+                     })
+                     .filter((obj) => obj.price.includes(filterPrice))
+                     .map((item, index) => {
+                        const { title, price, imageUrls, id, size, colors, salePrice, stock } = item;
+                        const gender = item.gender || (Array.isArray(item.category)
+                          ? (item.category.find(c => /men|women|kids|accessor/i.test(c)) || '').replace(/[^a-zA-Z]/g, '').replace(/s$/, '').replace(/^./, m => m.toUpperCase())
+                          : (item.category || '').replace(/[^a-zA-Z]/g, '').replace(/s$/, '').replace(/^./, m => m.toUpperCase()));
                         return (
-                            <div key={index} className="p-4 md:w-1/4 drop-shadow-lg">
-                                <div className="h-full border-2 hover:shadow-gray-90 hover:shadow-2xl transition-shadow duration-300 ease-in-out border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(40,44,52)' : '', color: mode === 'dark' ? 'white' : '', }}>
-                                    <div onClick={()=> window.location.href = `/productinfo/${id}`} className="flex justify-center cursor-pointer">
-                                        {imageUrls && imageUrls.map((url, index) => (
-                                            <img key={index} className="rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110 duration-300 ease-in-out" src={url} alt={`product-image-${index}`} />
-                                        ))}
-                                    </div>
-                                    
-                                    <div className="p-5 border-t-2">
-                                        <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>Viberaze</h2>
-                                        <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
-                                        <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹{price}</p>
-                                        <h6 className="title-font text-sm font-medium text-gray-90 mb-4" style={{ color: mode === 'dark' ? 'white' : '', }}>color</h6>
-                                        <div className="mt-6">
-                                            <h3 className="text-sm font-medium text-gray-900">Color</h3>
-                                            <div className="flex gap-2 mt-2">
-                                                {colors && colors.length > 0 && colors.map((color, i) => (
-                                                    <button
-                                                        key={i}
-                                                        className={`w-8 h-8 rounded-full border-2 ${selectedColor === color ? 'border-indigo-500' : 'border-transparent'}`}
-                                                        style={{ backgroundColor: color.toLowerCase() }}
-                                                        onClick={() => setSelectedColor(color)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="mb-3">
-                                            <label htmlFor="size" className="block text-sm font-medium text-gray-700" style={{ color: mode === 'dark' ? 'white' : '', }}>Size</label>
-                                            <select
-                                                id="size"
-                                                name="size"
-                                                value={selectedSize}
-                                                onChange={(e) => setSelectedSize(e.target.value)}
-                                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                                style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }}
+                            <div key={index} className="w-full">
+                                <div className="relative group bg-white rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 ease-in-out">
+                                    {/* Product Image Container */}
+                                    <Link to={`/productinfo/${id}`} className="block">
+                                        <div className="relative overflow-hidden bg-white rounded-lg">
+                                            {/* Wishlist Button - Top Right */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleWishlist(item);
+                                                }}
+                                                className={`absolute top-2 right-2 p-1.5 rounded-full transition-all duration-200 z-10 ${
+                                                    isInWishlist(id) 
+                                                        ? 'bg-gray-900 text-white' 
+                                                        : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                                                } shadow-sm`}
                                             >
-                                                <option value="">Select size</option>
-                                                <option value="S">S</option>
-                                                <option value="M">M</option>
-                                                <option value="L">L</option>
-                                                <option value="XL">XL</option>
-                                                {size && size.split(',').map((s, i) => (
-                                                    <option key={i} value={s}>{s}</option>
-                                                ))}
-                                            </select>
+                                                <Heart size={16} className={isInWishlist(id) ? 'fill-current' : ''} />
+                                            </button>
+                                    
+                                            {/* Sale Badge - Top Left */}
+                                    {salePrice && (
+                                                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium z-10">
+                                            {Math.round(((price - salePrice) / price) * 100)}% OFF
                                         </div>
-                                        <div className="flex justify-center">
-                                            <button type="button" 
-                                            onClick={()=> addCart(item)}
-                                            className="focus:outline-none text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full py-2">Add To Cart</button>
+                                    )}
+
+                                    {/* Stock Badge */}
+                                    {stock === 0 && (
+                                                <div className="absolute top-2 left-2 bg-gray-500 text-white px-2 py-1 rounded text-xs font-medium z-10">
+                                            Out of Stock
+                                        </div>
+                                    )}
+
+                                    {/* Product Image */}
+                                            <div className="aspect-[3/4] relative">
+                                                {imageUrls && imageUrls.length > 0 && (
+                                                    <>
+                                                <img 
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out" 
+                                                            src={imageUrls[0]} 
+                                                            alt={title}
+                                                            title={title}
+                                                            draggable="false"
+                                                            loading="lazy"
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                            }}
+                                                />
+                                                        {imageUrls.length > 1 && (
+                                                            <img 
+                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out absolute inset-0 opacity-0 group-hover:opacity-100" 
+                                                                src={imageUrls[1]} 
+                                                                alt={`${title}-hover`}
+                                                                title={`${title}-hover`}
+                                                                draggable="false"
+                                                                loading="lazy"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
+                                    </div>
+                                    </Link>
+                                    
+                                    {/* Product Info - Myntra Style */}
+                                    <div className="mt-2 px-1 pb-3">
+                                        {/* Brand */}
+                                        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">
+                                            Viberaze
+                                        </h3>
+                                        
+                                        {/* Product Title */}
+                                        <h4 className="text-sm text-gray-600 mb-2 line-clamp-2 leading-tight">
+                                            {gender && (
+                                                <span className="inline-block mb-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-black-100 text-black-800 border border-black-300">
+                                                    {gender}
+                                                </span>
+                                            )}
+                                            {title}
+                                        </h4>
+                                        
+                                        {/* Price */}
+                                        <div className="flex items-center gap-2 mb-1">
+                                            {salePrice ? (
+                                                <>
+                                                    <span className="text-sm font-semibold text-gray-900">₹{salePrice}</span>
+                                                    <span className="text-sm text-gray-500 line-through">₹{price}</span>
+                                                    <span className="text-xs text-green-600 font-medium">
+                                                        ({Math.round(((price - salePrice) / price) * 100)}% OFF)
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <span className="text-sm font-semibold text-gray-900">₹{price}</span>
+                                            )}
+                                        </div>
+
+                                        {/* Rating */}
+                                        <div className="flex items-center gap-1">
+                                            <div className="flex items-center bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-xs font-medium">
+                                                <span>4.2</span>
+                                                <Star size={10} className="ml-1 fill-current" />
+                                            </div>
+                                            <span className="text-xs text-gray-500">(2.5k)</span>
                                         </div>
                                     </div>
                                 </div>

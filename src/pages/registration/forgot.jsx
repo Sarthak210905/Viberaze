@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { useState } from 'react';
-import { auth } from '../../fireabase/FirebaseConfig';
+import { auth } from '../../firebase/FirebaseConfig';
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');

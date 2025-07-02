@@ -1,10 +1,9 @@
 import React, { useContext } from "react";
-import { useDispatch } from "react-redux";
-import { PlaceOrder, UpdateOrderStatus } from "../../redux/status"; // Import UpdateOrderStatus action
 import myContext from "../../context/data/myContext";
 import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
 import { Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const OrderStatus = ({ status }) => {
   const statusConfig = {
@@ -148,20 +147,24 @@ const OrderCard = ({ order, mode, onUpdateStatus }) => {
             </div>
           )}
         </div>
+
+        <div className="mt-4 flex justify-end">
+          <Link to={`/invoice/${order.paymentId}`} className="bg-gray-900 text-white px-4 py-2 rounded-full font-medium hover:bg-gray-800 transition-colors">View Invoice</Link>
+        </div>
       </div>
     </div>
   );
 };
 
 const OrderList = ({ orders, mode, onUpdateStatus }) => (
-  <div className="max-w-4xl mx-auto px-4 py-8">
+  <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
     <h1
       className="text-2xl font-bold mb-6"
       style={{ color: mode === "dark" ? "white" : "inherit" }}
     >
       Your Orders
     </h1>
-    <div className="space-y-6">
+    <div className="space-y-3">
       {orders.map((order, index) => (
         <OrderCard key={index} order={order} mode={mode} onUpdateStatus={onUpdateStatus} />
       ))}
@@ -171,23 +174,10 @@ const OrderList = ({ orders, mode, onUpdateStatus }) => (
 
 const Order = () => {
   const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?.user?.uid;
+  const userId = user?.user?.uid || user?.uid || user?.id;
   const { mode, loading, orders } = useContext(myContext);
-  const dispatch = useDispatch();
-
-  const handlePlaceOrder = () => {
-    const newOrder = {
-      id: Date.now(),
-      userid: userId,
-      status: "processing",
-      // Add other necessary order details here
-    };
-    dispatch(PlaceOrder(newOrder));
-  };
-
-  const handleUpdateStatus = (orderId, status) => {
-    dispatch(UpdateOrderStatus({ orderId, status }));
-  };
+  console.log('orders:', orders);
+  console.log('userId:', userId);
 
   if (loading) {
     return (
@@ -197,36 +187,40 @@ const Order = () => {
     );
   }
 
-  if (!Array.isArray(orders) || orders.length === 0) {
+  if (!userId) {
     return (
       <Layout>
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <Package size={48} className="text-gray-400 mb-4" />
           <h2 className="text-2xl font-semibold text-gray-600 dark:text-gray-300 text-center">
-            No Orders Found
+            Please log in to view your orders.
           </h2>
-          <p className="mt-2 text-gray-500 dark:text-gray-400 text-center">
-            When you make a purchase, your orders will appear here
-          </p>
-
         </div>
       </Layout>
     );
-  };
+  }
 
-  const userOrders = orders.filter((obj) => obj.userid === userId);
+  const userOrders = userId ? orders.filter((obj) => obj.userid === userId) : orders;
+
+  if (!Array.isArray(userOrders) || userOrders.length === 0) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <Package size={48} className="text-gray-400 mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-600 dark:text-gray-300 text-center">
+            You have no orders yet
+          </h2>
+          <p className="mt-2 text-gray-500 dark:text-gray-400 text-center">
+            When you make a purchase, your orders will appear here.
+          </p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <OrderList orders={userOrders} mode={mode} onUpdateStatus={handleUpdateStatus} />
-      <div className="flex justify-center mt-6">
-        <button
-          onClick={handlePlaceOrder}
-          className="px-4 py-2 text-white rounded"
-        >
-          
-        </button>
-      </div>
+      <OrderList orders={userOrders} mode={mode} />
     </Layout>
   );
 };

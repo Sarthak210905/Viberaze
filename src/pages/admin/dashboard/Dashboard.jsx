@@ -1,105 +1,70 @@
 import React, { useContext } from 'react';
-import { FaUserTie, FaShoppingBag, FaShoppingCart, FaUsers } from 'react-icons/fa';
+import { FaUserFriends } from 'react-icons/fa';
+import myContext from '../../../context/data/myContext';
+import { FaBoxOpen, FaShoppingCart, FaUsers } from 'react-icons/fa';
 import Layout from '../../../components/layout/Layout';
 import DashboardTab from './DashboardTab';
-import myContext from '../../../context/data/myContext';
-import { useDispatch } from 'react-redux';
-import { UpdateShippingStatus} from '../../../redux/status';
 
 function Dashboard() {
-  const context = useContext(myContext);
-  const { mode, product, order, user } = context;
-  const dispatch = useDispatch();
+    const context = useContext(myContext);
+    const { product, orders, user } = context;
 
-  const handleUpdateShippingStatus = (orderId, newStatus) => {
-    dispatch(UpdateShippingStatus({ id: orderId, shippingStatus: newStatus }));
-  };
-
-  const handleUpdateDeliveryStatus = (orderId, newStatus) => {
-    dispatch(UpdateDeliveryStatus({ id: orderId, deliveryStatus: newStatus }));
-  };
-
-  // Ensure order is defined before using reduce
-  const totalRevenue = order?.reduce((acc, curr) => {
-    return acc + curr.cartItems.reduce((itemAcc, item) => {
-      return itemAcc + (item.price * item.quantity);
+    const totalProducts = product.length;
+    const totalOrders = orders.length;
+    const totalUsers = user.length;
+    const totalSales = orders.reduce((acc, order) => {
+        const orderTotal = order.cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        return acc + orderTotal;
     }, 0);
-  }, 0) || 0;
 
-  const dashboardStats = [
-    {
-      icon: <FaShoppingBag size={40} />,
-      title: "Total Products",
-      value: product?.length || 0,
-      color: "from-pink-500 to-rose-500"
-    },
-    {
-      icon: <FaShoppingCart size={40} />,
-      title: "Total Orders",
-      value: order?.length || 0,
-      color: "from-purple-500 to-indigo-500"
-    },
-    {
-      icon: <FaUsers size={40} />,
-      title: "Total Users",
-      value: user?.length || 0,
-      color: "from-cyan-500 to-blue-500"
-    },
-    {
-      icon: <FaUserTie size={40} />,
-      title: "Total Revenue",
-      value: `₹${totalRevenue.toLocaleString()}`,
-      color: "from-green-500 to-emerald-500"
-    }
-  ];
+    return (
+        <Layout>
+            <section className="text-gray-600 body-font mt-10 mb-10">
+                <div className="container px-5 mx-auto mb-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        {/* Total Sales */}
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p className="text-lg font-semibold">Total Sales</p>
+                                <p className="text-3xl font-bold">₹{totalSales.toFixed(2)}</p>
+                            </div>
+                            <FaShoppingCart className="h-12 w-12 opacity-75" />
+                        </div>
 
-  const StatCard = ({ stat }) => (
-    <div className="p-4 md:w-1/4 sm:w-1/2 w-full">
-      <div className="relative overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-        {/* Gradient Background */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-90`} />
-        
-        {/* Content */}
-        <div className="relative p-6 text-white">
-          <div className="w-12 h-12 mb-4 opacity-90">
-            {stat.icon}
-          </div>
-          
-          <h2 className="text-4xl font-bold mb-2 tracking-tight">
-            {stat.value}
-          </h2>
-          
-          <p className="text-lg font-medium opacity-90">
-            {stat.title}
-          </p>
+                        {/* Total Orders */}
+                        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p className="text-lg font-semibold">Total Orders</p>
+                                <p className="text-3xl font-bold">{totalOrders}</p>
+                            </div>
+                            <FaBoxOpen className="h-12 w-12 opacity-75" />
+                        </div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 -mt-6 -mr-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 left-0 -mb-6 -ml-6 w-24 h-24 bg-black/10 rounded-full blur-2xl" />
-        </div>
-      </div>
-    </div>
-  );
+                        {/* Total Products */}
+                        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p className="text-lg font-semibold">Total Products</p>
+                                <p className="text-3xl font-bold">{totalProducts}</p>
+                            </div>
+                            <FaBoxOpen className="h-12 w-12 opacity-75" />
+                        </div>
 
-  return (
-    <Layout>
-      <section className="py-12">
-        <div className="container px-4 mx-auto">
-          {/* Stats Grid */}
-          <div className="flex flex-wrap -m-4">
-            {dashboardStats.map((stat, index) => (
-              <StatCard key={index} stat={stat} />
-            ))}
-          </div>
+                        {/* Total Users */}
+                        <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p className="text-lg font-semibold">Total Users</p>
+                                <p className="text-3xl font-bold">{totalUsers}</p>
+                            </div>
+                            <FaUsers className="h-12 w-12 opacity-75" />
+                        </div>
 
-          {/* Dashboard Tab Section */}
-          <div className="mt-12">
-            <DashboardTab />
-          </div>
-        </div>
-      </section>
-    </Layout>
-  );
+                    </div>
+                </div>
+                <DashboardTab />
+            </section>
+        </Layout>
+    );
 }
 
 export default Dashboard;

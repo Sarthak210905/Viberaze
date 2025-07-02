@@ -1,8 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
-import { toast } from "react-toastify"; // Add this import
-import { auth, fireDB } from "../../fireabase/FirebaseConfig"; // Corrected import path
-import { User } from "lucide-react";
+import PropTypes from 'prop-types';
 
 export default function Modal({
   name,
@@ -162,3 +160,15 @@ export default function Modal({
     </>
   );
 }
+
+Modal.propTypes = {
+    name: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    pincode: PropTypes.string.isRequired,
+    phoneNumber: PropTypes.string.isRequired,
+    setName: PropTypes.func.isRequired,
+    setAddress: PropTypes.func.isRequired,
+    setPincode: PropTypes.func.isRequired,
+    setPhoneNumber: PropTypes.func.isRequired,
+    buyNow: PropTypes.func.isRequired
+};

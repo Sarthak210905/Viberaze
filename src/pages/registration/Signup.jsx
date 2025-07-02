@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Phone } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth, fireDB } from '../../fireabase/FirebaseConfig';
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
+import { auth, fireDB } from '../../firebase/FirebaseConfig';
 import { Timestamp, addDoc, collection } from 'firebase/firestore';
 import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
@@ -11,18 +11,33 @@ import Footer from "../../components/footer/Footer";
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Phone number validation function
+  const validatePhoneNumber = (phoneNumber) => {
+    // Basic phone number validation for Indian numbers
+    const phoneRegex = /^[6-9]\d{9}$/;
+    return phoneRegex.test(phoneNumber.replace(/\s/g, ''));
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     // Input validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
       toast.error('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    // Phone number validation
+    if (!validatePhoneNumber(phone)) {
+      toast.error('Please enter a valid 10-digit phone number');
       setLoading(false);
       return;
     }
@@ -31,12 +46,18 @@ const Signup = () => {
       // Create user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
+      // Update user profile with display name
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+
       // Send verification email
       await sendEmailVerification(userCredential.user);
 
       // Store user data in Firestore
       const userData = {
         name,
+        phone,
         uid: userCredential.user.uid,
         email: userCredential.user.email,
         createdAt: Timestamp.now()
@@ -44,9 +65,18 @@ const Signup = () => {
 
       await addDoc(collection(fireDB, 'users'), userData);
 
+      // Store user data in localStorage for immediate access
+      const userForLocalStorage = {
+        name,
+        email: userCredential.user.email,
+        phone,
+        uid: userCredential.user.uid
+      };
+      localStorage.setItem('user', JSON.stringify(userForLocalStorage));
+
       // Success notifications and navigation
       toast.success('Sign up successful! Please verify your email.');
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       // Error handling
       const errorMessage = error.code === 'auth/email-already-in-use' 
@@ -107,6 +137,19 @@ const Signup = () => {
               required
               className="w-full px-3 py-2 sm:py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
             />
+          </div>
+
+          <div className="relative">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone Number (10 digits)"
+              required
+              maxLength={10}
+              className="w-full px-3 py-2 sm:py-3 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+            />
+            <Phone size={20} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
           
           <div className="relative">

@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import myContext from '../../context/data/myContext'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../redux/cartSlice'
 import { toast } from 'react-toastify'
 
-function TrendingCard() {
+function Trending() {
     const context = useContext(myContext)
-    const { mode, product ,searchkey, setSearchkey,filterType,setFilterType,
-        filterPrice,setFilterPrice} = context
+    const { mode, product ,searchkey, filterType, filterPrice} = context
 
     const dispatch = useDispatch()
     const cartItems = useSelector((state)=> state.cart);
@@ -37,13 +36,13 @@ function TrendingCard() {
                 <div className="flex flex-wrap -m-4">
                     {product.filter((obj)=> obj.title.toLowerCase().includes(searchkey))
                      .filter((obj) => obj.category.toLowerCase().includes(filterType))
-                     .filter((obj) => obj.price.includes(filterPrice)).map((item, index) => {
-                        const { title, price, description, imageUrls, id, size, colors } = item;
+                     .filter((obj) => obj.price.includes(filterPrice)).map((item) => {
+                        const { title, price, imageUrls, id, size, colors } = item;
                         return (
-                            <div key={1} className="p-4 md:w-1/4 drop-shadow-lg">
+                            <div key={id} className="p-4 md:w-1/4 drop-shadow-lg">
                                 <div className="h-full border-2 hover:shadow-gray-90 hover:shadow-2xl transition-shadow duration-300 ease-in-out border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(40,44,52)' : '', color: mode === 'dark' ? 'white' : '', }}>
                                     <div onClick={()=> window.location.href = `/productinfo/${id}`} className="flex justify-center cursor-pointer">
-                                        {imageUrls.map((url,index=1) => (
+                                        {imageUrls.map((url,index) => (
                                             <img key={index} className="rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110 duration-300 ease-in-out" src={url} alt={`product-image-${index}`} />
                                         ))}
                                     </div>
@@ -88,7 +87,11 @@ function TrendingCard() {
                                         <div className="flex justify-center">
                                             <button type="button" 
                                             onClick={()=> addCart(item)}
-                                            className="focus:outline-none text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full py-2">Add To Cart</button>
+                                            disabled={Number(item.stock) === 0}
+                                            className={`focus:outline-none font-medium rounded-lg text-sm w-full py-2 ${Number(item.stock) === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-pink-600 text-white hover:bg-pink-700'}`}
+                                            >
+                                            {Number(item.stock) === 0 ? 'Out of Stock' : 'Add To Cart'}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -101,4 +104,4 @@ function TrendingCard() {
     )
 }
 
-export default TrendingCard
+export default Trending

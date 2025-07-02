@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../fireabase/FirebaseConfig";
+import { auth, fireDB } from "../../firebase/FirebaseConfig";
 import { toast } from "react-toastify";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import myContext from "../../context/data/myContext";
 import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
@@ -20,13 +21,34 @@ const Login = () => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       
+      // Fetch user data from Firestore to get phone number
+      const usersRef = collection(fireDB, 'users');
+      const q = query(usersRef, where("uid", "==", result.user.uid));
+      const querySnapshot = await getDocs(q);
+      
+      let userData = {
+        name: result.user.displayName || result.user.email.split('@')[0],
+        email: result.user.email,
+        uid: result.user.uid,
+        phone: ''
+      };
+      
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0].data();
+        userData = {
+          ...userData,
+          name: userDoc.name || userData.name,
+          phone: userDoc.phone || ''
+        };
+      }
+      
       toast.success("Welcome back!", {
         position: "top-right",
         autoClose: 2000,
         theme: "light"
       });
       
-      localStorage.setItem("user", JSON.stringify(result));
+      localStorage.setItem("user", JSON.stringify(userData));
       navigate("/");
     } catch (error) {
       toast.error("Login failed. Please check your credentials.", {

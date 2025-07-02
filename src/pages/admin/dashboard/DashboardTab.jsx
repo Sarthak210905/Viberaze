@@ -3,48 +3,29 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import myContext from '../../../context/data/myContext';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
 import { FaUser, FaCartPlus } from 'react-icons/fa';
-import { AiFillShopping } from 'react-icons/ai';
+import { AiFillShopping, AiFillPieChart, AiOutlineMail } from 'react-icons/ai';
+import { RiCoupon3Fill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { UpdateOrderStatus } from '../../../redux/status';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateOrderStatus } from '../../../redux/orderSlice';
+import Analytics from './Analytics';
+import CouponManagement from '../page/CouponManagement';
+import CustomerManagement from '../page/CustomerManagement';
+import EmailManagement from '../page/EmailManagement';
 
 function DashboardTab() {
     const context = useContext(myContext);
-    const { mode, product, edithandle, deleteProduct, orders, user } = context; // Use orders instead of order
+    const { product, edithandle, deleteProduct, user } = context; 
+    
+    const { items: orders } = useSelector((state) => state.order);
     const dispatch = useDispatch();
     
     const handleAddProduct = () => {
         window.location.href = '/addproduct';
     }
-    const addresses = orders?.reduce((acc, curr) => { // Use orders instead of order
-        if (curr.addressInfo && typeof curr.addressInfo === 'object') {
-            const address = {
-                name: curr.addressInfo.name,
-                address: curr.addressInfo.address,
-                pincode: curr.addressInfo.pincode,
-                phoneNumber: curr.addressInfo.phoneNumber,
-                email: curr.email,
-                userId: curr.userid,
-                lastUsed: curr.date
-            };
-            // Only add if not already present (checking by combination of address and user)
-            const exists = acc.some(a => 
-                a.address === address.address && 
-                a.userId === address.userId
-            );
-            if (!exists) {
-                acc.push(address);
-            }
-        }
-        return acc;
-    }, []);
 
-    const updateOrderStatus = (paymentId, status) => {
-        const updatedOrder = orders.find(o => o.paymentId === paymentId); // Use orders instead of order
-        if (updatedOrder) {
-            updatedOrder.status = status;
-            dispatch(UpdateOrderStatus(updatedOrder));
-        }
+    const handleUpdateStatus = (orderId, status) => {
+        dispatch(updateOrderStatus({ orderId, status }));
     };
 
     return (
@@ -69,6 +50,30 @@ function DashboardTab() {
                             Users
                         </button>
                     </Tab>
+                    <Tab className="w-full md:w-auto">
+                        <button className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <RiCoupon3Fill className="h-5 w-5" />
+                            Coupons
+                        </button>
+                    </Tab>
+                    <Tab className="w-full md:w-auto">
+                        <button className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <FaUser className="h-5 w-5" />
+                            Customers
+                        </button>
+                    </Tab>
+                    <Tab className="w-full md:w-auto">
+                        <button className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <AiOutlineMail className="h-5 w-5" />
+                            Email
+                        </button>
+                    </Tab>
+                    <Tab className="w-full md:w-auto">
+                        <button className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <AiFillPieChart className="h-5 w-5" />
+                            Analytics
+                        </button>
+                    </Tab>
                 </TabList>
 
                 <TabPanel>
@@ -91,6 +96,7 @@ function DashboardTab() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -102,13 +108,24 @@ function DashboardTab() {
                                             <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <img 
-                                                    src={item.imageUrl} 
+                                                    src={item.imageUrls && item.imageUrls[0]} 
                                                     alt={item.title}
                                                     className="w-16 h-16 object-cover rounded"
                                                 />
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">{item.title}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">₹{item.price}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {item.stock > 0 ? (
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.stock < 10 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                                                        {item.stock} in stock
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                        Out of stock
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">{item.category}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{item.date}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -140,9 +157,9 @@ function DashboardTab() {
                 <TabPanel>
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-bold mb-6">Order Details</h2>
-                        {orders && orders.length > 0 ? ( // Use orders instead of order
-                            orders.map((allorder, index) => ( // Use orders instead of order
-                                <div key={index} className="mb-8">
+                        {orders && orders.length > 0 ? (
+                            orders.map((order, index) => (
+                                <div key={index} className="mb-8 overflow-x-auto">
                                     <table className="w-full">
                                         <thead className="bg-gray-50">
                                             <tr>
@@ -157,12 +174,12 @@ function DashboardTab() {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
-                                            {allorder.cartItems.map((item, itemIndex) => (
+                                            {order.cartItems.map((item, itemIndex) => (
                                                 <tr key={itemIndex}>
-                                                    <td className="px-6 py-4 whitespace-nowrap">{allorder.paymentId}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{order.paymentId}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <img 
-                                                            src={item.imageUrls[0]} 
+                                                            src={item.imageUrl || item.imageUrls[0]} 
                                                             alt={item.title}
                                                             className="w-16 h-16 object-cover rounded"
                                                         />
@@ -172,17 +189,19 @@ function DashboardTab() {
                                                     <td className="px-6 py-4 whitespace-nowrap">{item.category}</td>
                                                     <td className="px-6 py-4">
                                                         <div className="space-y-1">
-                                                            <p className="text-sm text-gray-500">{allorder.addressInfo}</p>
-                                                            <p className="text-sm text-gray-500">{allorder.phoneNumber}</p>
-                                                            <p className="text-sm text-gray-500">{allorder.email}</p>
+                                                            <p className="text-sm text-gray-900 font-medium">{order.addressInfo.name}</p>
+                                                            <p className="text-sm text-gray-500">{order.addressInfo.address}</p>
+                                                            <p className="text-sm text-gray-500">{order.addressInfo.pincode}</p>
+                                                            <p className="text-sm text-gray-500">{order.addressInfo.phoneNumber}</p>
+                                                            <p className="text-sm text-gray-500">{order.email}</p>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">{allorder.date}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <select 
-                                                            value={allorder.status} 
-                                                            onChange={(e) => updateOrderStatus(allorder.paymentId, e.target.value)}
-                                                            className="border border-gray-300 rounded p-2"
+                                                            value={order.status} 
+                                                            onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
+                                                            className="border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                         >
                                                             <option value="processing">Processing</option>
                                                             <option value="shipped">Shipped</option>
@@ -225,6 +244,22 @@ function DashboardTab() {
                             </tbody>
                         </table>
                     </div>
+                </TabPanel>
+
+                <TabPanel>
+                    <CouponManagement />
+                </TabPanel>
+
+                <TabPanel>
+                    <CustomerManagement />
+                </TabPanel>
+
+                <TabPanel>
+                    <EmailManagement />
+                </TabPanel>
+
+                <TabPanel>
+                    <Analytics />
                 </TabPanel>
             </Tabs>
         </div>
