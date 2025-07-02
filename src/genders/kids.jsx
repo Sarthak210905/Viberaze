@@ -141,11 +141,8 @@ function Kids() {
   }, [])
 
   // Dynamically generate available filter options from filteredProducts
-<<<<<<< HEAD
   const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).filter(size => typeof size === 'string').map(size => size.toUpperCase()))];
-=======
-  const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).map(size => size.toUpperCase()))];
->>>>>>> bb200b02f1d148465155b621a86f6cd49ebdae3e
+  // const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
   const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
   const availableCategories = categories.filter(cat =>
     cat.value === '' || filteredProducts.some(p => Array.isArray(p.category)
