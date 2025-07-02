@@ -18,7 +18,7 @@ const SearchBar = () => {
       const words = term.split(/\s+/);
       const filtered = safeProducts.filter(product => {
         const text = [product.title, product.description, product.category]
-          .map(x => (x || '').toLowerCase())
+          .map(x => typeof x === 'string' ? x.toLowerCase() : '')
           .join(' ');
         return words.every(word => text.includes(word));
       });

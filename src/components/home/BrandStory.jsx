@@ -35,7 +35,7 @@ const BrandStory = () => (
       </div>
       {/* Right: Image */}
       <div className="flex-1 flex justify-center items-center">
-        <img src="/public/Viberaze (1).png" alt="Brand Story" className="rounded-3xl shadow-lg w-full max-w-2xl h-[20rem] object-cover border-2 border-slate-900" />
+        <img src="./Viberaze (1).png" alt="Brand Story" className="rounded-3xl shadow-lg w-full max-w-2xl h-[20rem] object-cover border-2 border-slate-900" />
       </div>
     </div>
   </section>

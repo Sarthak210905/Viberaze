@@ -29,9 +29,9 @@ function Allproducts() {
     .filter(obj =>
       !activeCategory || (Array.isArray(obj.category)
         ? obj.category.some(c => typeof c === 'string' && c.toLowerCase().includes(activeCategory))
-        : obj.category?.toLowerCase().includes(activeCategory))
+        : typeof obj.category === 'string' && obj.category.toLowerCase().includes(activeCategory))
     )
-    .filter(obj => obj.title.toLowerCase().includes(search.toLowerCase()))
+    .filter(obj => typeof obj.title === 'string' && typeof search === 'string' && obj.title.toLowerCase().includes(search.toLowerCase()))
     .filter(obj => {
       const price = parseFloat(obj.salePrice || obj.price)
       return price >= priceRange[0] && price <= priceRange[1]
@@ -39,15 +39,15 @@ function Allproducts() {
     .filter(obj => {
       if (selectedSizes.length === 0) return true
       return selectedSizes.some(size =>
-        obj.size?.toLowerCase().includes(size.toLowerCase()) ||
-        obj.sizes?.some(s => s.toLowerCase().includes(size.toLowerCase()))
+        (typeof obj.size === 'string' && typeof size === 'string' && obj.size.toLowerCase().includes(size.toLowerCase())) ||
+        (Array.isArray(obj.sizes) && obj.sizes.some(s => typeof s === 'string' && typeof size === 'string' && s.toLowerCase().includes(size.toLowerCase())))
       )
     })
     .filter(obj => {
       if (selectedColors.length === 0) return true
       return selectedColors.some(color =>
-        obj.color?.toLowerCase().includes(color.toLowerCase()) ||
-        obj.colors?.some(c => c.toLowerCase().includes(color.toLowerCase()))
+        (typeof obj.color === 'string' && typeof color === 'string' && obj.color.toLowerCase().includes(color.toLowerCase())) ||
+        (Array.isArray(obj.colors) && obj.colors.some(c => typeof c === 'string' && typeof color === 'string' && c.toLowerCase().includes(color.toLowerCase())))
       )
     })
     .sort((a, b) => {

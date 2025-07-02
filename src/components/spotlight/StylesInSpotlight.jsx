@@ -3,7 +3,7 @@ function StylesInSpotlight() {
     { image: './Desi (1).png', title: 'Desi Elegance' },
     { image: './classic-comfort.png', title: 'Classic Comfort' },
     { image: './urban-edge.png', title: 'Urban Edge' },
-    { image: '/public/NEW (1).png', title: 'Minimalist Chic' },
+    { image: './NEW (1).png', title: 'Minimalist Chic' },
   ];
   return (
     <section className="py-12 bg-gray-50">

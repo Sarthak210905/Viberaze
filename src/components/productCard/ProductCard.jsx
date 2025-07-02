@@ -45,12 +45,12 @@ function ProductCard() {
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {product
-                     .filter((obj) => obj.title.toLowerCase().includes(searchkey))
+                     .filter((obj) => typeof obj.title === 'string' && obj.title.toLowerCase().includes(searchkey))
                      .filter((obj) => {
                         if (Array.isArray(obj.category)) {
                             return obj.category.some(c => typeof c === 'string' && c.toLowerCase().includes(filterType));
                         } else {
-                            return obj.category?.toLowerCase().includes(filterType);
+                            return typeof obj.category === 'string' && obj.category.toLowerCase().includes(filterType);
                         }
                      })
                      .filter((obj) => obj.price.includes(filterPrice))

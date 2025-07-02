@@ -32,11 +32,11 @@ function Men() {
 
   // Product Categories
   const categories = [
-    { name: 'All', value: '', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes('men')) : p.category?.toLowerCase().includes('men')).length },
-    { name: 'T-Shirts', value: 't-shirt', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes('t-shirt')) : p.category?.toLowerCase().includes('t-shirt')).length },
-    { name: 'Shirts', value: 'shirt', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes('shirt') && !c.toLowerCase().includes('t-shirt')) : p.category?.toLowerCase().includes('shirt') && !p.category?.toLowerCase().includes('t-shirt')).length },
-    { name: 'Hoodies', value: 'hoodie', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes('hoodie')) : p.category?.toLowerCase().includes('hoodie')).length },
-    { name: 'Jackets', value: 'jacket', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes('jacket')) : p.category?.toLowerCase().includes('jacket')).length },
+    { name: 'All', value: '', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes('men')) : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes('men')).length },
+    { name: 'T-Shirts', value: 't-shirt', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes('t-shirt')) : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes('t-shirt')).length },
+    { name: 'Shirts', value: 'shirt', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes('shirt') && !c.toLowerCase().includes('t-shirt')) : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes('shirt') && !p.category.toLowerCase().includes('t-shirt')).length },
+    { name: 'Hoodies', value: 'hoodie', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes('hoodie')) : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes('hoodie')).length },
+    { name: 'Jackets', value: 'jacket', count: product.filter(p => Array.isArray(p.category) ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes('jacket')) : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes('jacket')).length },
   ]
 
   // Sort options
@@ -82,20 +82,20 @@ function Men() {
   const filteredProducts = product
     .filter(obj =>
       Array.isArray(obj.category)
-        ? obj.category.some(c => typeof c === 'string' && (c.toLowerCase().includes('men') || c.toLowerCase().includes('unisex')))
-        : obj.category?.toLowerCase().includes('men') || obj.category?.toLowerCase().includes('unisex')
+        ? obj.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && (c.toLowerCase().includes('men') || c.toLowerCase().includes('unisex')))
+        : (typeof obj.category === 'string' && typeof obj.category.toLowerCase === 'function' && (obj.category.toLowerCase().includes('men') || obj.category.toLowerCase().includes('unisex')))
     )
     .filter(obj => {
       if (activeCategory && activeCategory !== '') {
         return Array.isArray(obj.category)
-          ? obj.category.some(c => typeof c === 'string' && c.toLowerCase().includes(activeCategory))
-          : obj.category?.toLowerCase().includes(activeCategory);
+          ? obj.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes(activeCategory))
+          : typeof obj.category === 'string' && typeof obj.category.toLowerCase === 'function' && obj.category.toLowerCase().includes(activeCategory);
       }
       return true;
     })
     .filter((obj) => {
       // Search filter
-      const searchMatch = obj.title.toLowerCase().includes(searchkey.toLowerCase())
+      const searchMatch = typeof obj.title === 'string' && typeof searchkey === 'string' && obj.title.toLowerCase().includes(searchkey.toLowerCase())
       
       // Price filter
       const price = parseFloat(obj.salePrice || obj.price)
@@ -105,8 +105,8 @@ function Men() {
       let sizeMatch = true
       if (selectedSizes.length > 0) {
         sizeMatch = selectedSizes.some(size => 
-          obj.size?.toLowerCase().includes(size.toLowerCase()) || 
-          obj.sizes?.some(s => s.toLowerCase().includes(size.toLowerCase()))
+          (typeof obj.size === 'string' && typeof size === 'string' && obj.size.toLowerCase().includes(size.toLowerCase())) || 
+          (Array.isArray(obj.sizes) && obj.sizes.some(s => typeof s === 'string' && typeof size === 'string' && s.toLowerCase().includes(size.toLowerCase())))
         )
       }
       
@@ -114,9 +114,9 @@ function Men() {
       let colorMatch = true
       if (selectedColors.length > 0) {
         colorMatch = selectedColors.some(color => 
-          obj.color?.toLowerCase().includes(color.toLowerCase()) ||
-          obj.colors?.some(c => c.toLowerCase().includes(color.toLowerCase())) ||
-          obj.title?.toLowerCase().includes(color.toLowerCase())
+          (typeof obj.color === 'string' && typeof color === 'string' && obj.color.toLowerCase().includes(color.toLowerCase())) ||
+          (Array.isArray(obj.colors) && obj.colors.some(c => typeof c === 'string' && typeof color === 'string' && c.toLowerCase().includes(color.toLowerCase()))) ||
+          (typeof obj.title === 'string' && typeof color === 'string' && obj.title.toLowerCase().includes(color.toLowerCase()))
         )
       }
       
@@ -146,12 +146,12 @@ function Men() {
   }, [])
 
   // Dynamically generate available filter options from filteredProducts
-  const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).map(size => size.toUpperCase()))];
-  const availableColors = [...new Set(filteredProducts.flatMap(p => p.colors || []).map(color => color.toLowerCase()))];
+  const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).filter(size => typeof size === 'string').map(size => size.toUpperCase()))];
+  const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
   const availableCategories = categories.filter(cat =>
     cat.value === '' || filteredProducts.some(p => Array.isArray(p.category)
-      ? p.category.some(c => typeof c === 'string' && c.toLowerCase().includes(cat.value))
-      : p.category?.toLowerCase().includes(cat.value))
+      ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes(cat.value))
+      : typeof p.category === 'string' && typeof p.category.toLowerCase === 'function' && p.category.toLowerCase().includes(cat.value))
   );
 
   // ProductCard component
