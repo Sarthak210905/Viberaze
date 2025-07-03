@@ -95,4 +95,4 @@ SearchBar.propTypes = {
   // Add any props if needed
 };
 
-export default SearchBar; 
+export default SearchBar

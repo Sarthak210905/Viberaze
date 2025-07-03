@@ -25,4 +25,4 @@ function StylesInSpotlight() {
   );
 }
 
-export default StylesInSpotlight; 
+export default StylesInSpotlight

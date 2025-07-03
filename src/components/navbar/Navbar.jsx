@@ -77,7 +77,17 @@ function Navbar() {
     <div className="bg-white sticky top-0 z-50 border-b border-gray-100 shadow-md" style={{ backgroundColor: mode === "dark" ? "rgb(18, 18, 18)" : "white" }}>
       {/* Mobile Menu Dialog */}
       <Transition.Root show={open} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
+        <Dialog as="div" className="relative z-40 lg:hidden" onClose={() => setOpen(false)}>
+          {/* Extra close button for reliability */}
+          {open && (
+            <button
+              type="button"
+              className="fixed inset-0 z-50 w-full h-full bg-transparent cursor-pointer"
+              style={{ pointerEvents: 'auto' }}
+              aria-label="Close sidebar overlay"
+              onClick={() => setOpen(false)}
+            />
+          )}
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -253,7 +263,7 @@ function Navbar() {
         </div>
 
         {/* Main Navigation */}
-        <nav className="w-full px-8">
+        <nav className="w-full pr-8">
           <div className="flex items-center justify-between h-16">
             {/* Left Side - Mobile Menu + Logo + Navigation */}
             <div className="flex items-center">
@@ -263,8 +273,10 @@ function Navbar() {
                 onClick={toggleMobileMenu}
                 className="lg:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
                 style={{ color: mode === "dark" ? "white" : "" }}
+                aria-label="Toggle sidebar"
+                aria-expanded={open}
               >
-                <Menu size={24} />
+                {open ? <X size={24} /> : <Menu size={24} />}
               </button>
 
               {/* Logo */}

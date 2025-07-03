@@ -142,8 +142,8 @@ function Kids() {
 
   // Dynamically generate available filter options from filteredProducts
   const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).filter(size => typeof size === 'string').map(size => size.toUpperCase()))];
-  // const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
   const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
+ 
   const availableCategories = categories.filter(cat =>
     cat.value === '' || filteredProducts.some(p => Array.isArray(p.category)
       ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes(cat.value))
@@ -169,11 +169,11 @@ function Kids() {
     }
     const isInWishlist = wishlistItems.some(item => item.id === id)
     return (
-      <div className="w-full">
+      <div className="aspect-[3/4] w-44 xs:w-48 relative mx-auto shadow-md">
         <div className="relative group bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out">
           {/* Product Image Container */}
           <div 
-            className="relative overflow-hidden bg-white rounded-lg cursor-pointer"
+            className="relative overflow-hidden bg-white rounded-lg cursor-pointer aspect-[3/4] w-44 xs:w-48 relative mx-0 xs:mx-auto"
             onMouseEnter={handleImageHover}
             onMouseLeave={handleImageLeave}
             onClick={() => window.location.href = `/productinfo/${id}`}
@@ -205,7 +205,7 @@ function Kids() {
               </span>
             )}
             {/* Product Image */}
-            <div className="aspect-[3/4] relative">
+            <div className="aspect-[3/4] w-44 xs:w-48 relative mx-0 xs:mx-auto">
               {imageUrls && imageUrls.length > 0 && (
                 <>
                   <img
@@ -264,27 +264,23 @@ function Kids() {
               )}
             </div>
             {/* Rating */}
-            <div className="flex items-center gap-1">
-              <div className="flex items-center bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded text-xs font-medium">
-                <span>4.3</span>
-                <Star size={10} className="ml-1 fill-current" />
-              </div>
-              <span className="text-xs text-gray-500">(1.8k)</span>
+            {Number(item.stock) === 0 && (
+            <div className="mt-1">
+              <span className="text-orange-600 font-semibold text-xs ml-2">Out Of Stock</span>
             </div>
-            {/* Add to Cart Button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addCartHandler(item);
-              }}
-              disabled={Number(item.stock) === 0}
-              className={`w-full mt-2 py-2 rounded-lg font-semibold text-sm transition-all duration-200 ${Number(item.stock) === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
-            >
-              {Number(item.stock) === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+          )}
+          
             {Number(item.stock) > 0 && Number(item.stock) <= 5 && (
-              <span className="text-orange-600 font-semibold text-xs ml-2">Only {item.stock} left!</span>
+              <div className="mt-1">
+                <span className="text-orange-600 font-semibold text-xs ml-2">Only {item.stock} left!</span>
+              </div>
             )}
+             {Number(item.stock) > 0 && Number(item.stock) >= 5 && (
+              <div className="mt-1">
+                <span className="text-green-600 font-semibold text-xs ml-2"> In Stock </span>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
@@ -651,6 +647,7 @@ function Kids() {
                     </button>
                   </div>
                 </div>
+                
               )}
             </div>
           </div>

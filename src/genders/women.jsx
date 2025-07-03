@@ -147,9 +147,9 @@ function Women() {
   }, [])
 
   // Dynamically generate available filter options from filteredProducts
-
   const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).filter(size => typeof size === 'string').map(size => size.toUpperCase()))];
   const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
+  
   const availableCategories = categories.filter(cat =>
     cat.value === '' || filteredProducts.some(p => Array.isArray(p.category)
       ? p.category.some(c => typeof c === 'string' && typeof c.toLowerCase === 'function' && c.toLowerCase().includes(cat.value))
@@ -180,11 +180,11 @@ function Women() {
     const isInWishlist = wishlistItems.some(item => item.id === id)
 
     return (
-      <div className="aspect-[3/4] w-48 relative mx-auto">
+      <div className="aspect-[3/4] w-44 xs:w-48 relative mx-auto shadow-md">
       <div className="relative group bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out ">
           {/* Product Image Container */}
         <div 
-          className="relative overflow-hidden bg-white rounded-lg cursor-pointer aspect-[3/4] w-48 relative"
+          className="relative overflow-hidden bg-white rounded-lg cursor-pointer aspect-[3/4] w-44 xs:w-48 relative mx-0 xs:mx-auto"
           onMouseEnter={handleImageHover}
           onMouseLeave={handleImageLeave}
           onClick={() => window.location.href = `/productinfo/${id}`}
@@ -210,12 +210,19 @@ function Women() {
                 -{discountPercent}%
               </div>
             )}
+            
+            {/* Out of Stock Badge */}
+            {Number(item.stock) === 0 && (
+              <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded z-10">
+                Out of Stock
+              </span>
+            )}
 
             {/* Product Image */}
           {/* <div className="aspect-[3/4] relative"> */}
           {/* <div className="aspect-square w-32 relative">  */}
           {/* <div className="w-40 h-50 relative"> */}
-          <div className="aspect-[3/4] w-48 relative">
+          <div className="aspect-[3/4] w-44 xs:w-48 relative mx-0 xs:mx-auto">
           {imageUrls && imageUrls.length > 0 && (
             <>
               <img
@@ -244,8 +251,8 @@ function Women() {
                 setShowSimilarColors(!showSimilarColors);
               }}
             >
-            <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-1"></div>
-              <span className={`${mode === 'dark' ? 'text-gray-300' : 'text-gray-600'} font-medium`}>VIEW SIMILAR</span>
+            {/* <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mr-1"></div> */}
+              {/* <span className={`${mode === 'dark' ? 'text-gray-300' : 'text-gray-600'} font-medium`}>VIEW SIMILAR</span> */}
           </div>
         </div>
 
@@ -278,21 +285,19 @@ function Women() {
             )}
           </div>
           
-            {/* Rating */}
-          {/* <div className="flex items-center gap-1">
-            <div className="flex items-center bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-xs font-medium">
-              <span>4.2</span>
-                <Star size={10} className="ml-1 fill-current" />
-            </div>
-            <span className="text-xs text-gray-500">(2.5k)</span>
-          </div> */}
+          
 
-        
-          {Number(item.stock) > 0 && Number(item.stock) <= 5 && (
+          {/* Out Of Stock indicator */}
+          {Number(item.stock) === 0 && (
+            <div className="mt-1">
+              <span className="text-orange-600 font-semibold text-xs ml-2">Out Of Stock</span>
+            </div>
+          )}
+           {Number(item.stock) > 0 && Number(item.stock) <= 5 && (
             <div className="mt-1">
             <span className="text-orange-600 font-semibold text-xs ml-2">Only {item.stock} left!</span>
             </div>
-          )}
+           )}
            {Number(item.stock) > 0 && Number(item.stock) >= 5 && (
             <div className="mt-1">
               <span className="text-green-600 font-semibold text-xs ml-2"> In Stock </span>
@@ -307,7 +312,7 @@ function Women() {
   return (
     <Layout>
       <div className={`min-h-screen transition-colors duration-300 ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className="w-full px-6 sm:px-8">
+        <div className={`w-full px-0 xs:px-6 sm:px-8`}>
           
         {/* Header */}
           <div className="mb-3 mt-4">
@@ -680,7 +685,7 @@ function Women() {
                     <p className="text-sm">Try adjusting your search or filter criteria</p>
             </div>
           ) : (
-                  <div className={`grid gap-2 sm:gap-3 ${
+                  <div className={`grid gap-2 xs:gap-2 sm:gap-3 ${
               viewMode === 'grid' 
                       ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3' 
                 : 'grid-cols-1'

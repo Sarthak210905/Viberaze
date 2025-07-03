@@ -139,11 +139,7 @@ function Accessories() {
     })
 
   // Dynamically generate available filter options from filteredProducts
-// <<<<<<< HEAD
   const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).filter(size => typeof size === 'string').map(size => size.toUpperCase()))];
-// =======
-  // const availableSizes = [...new Set(filteredProducts.flatMap(p => p.sizes || []).map(size => size.toUpperCase()))];
-// >>>>>>> bb200b02f1d148465155b621a86f6cd49ebdae3e
   const availableColors = [...new Set(filteredProducts.flatMap(p => Array.isArray(p.colors) ? p.colors.filter(color => typeof color === 'string').map(color => color.toLowerCase()) : []))];
   const availableCategories = categories.filter(cat =>
     cat.value === '' || filteredProducts.some(p => Array.isArray(p.category)
@@ -713,7 +709,7 @@ function Accessories() {
                 ) : (
                   <div className={`grid gap-2 sm:gap-3 ${
                     viewMode === 'grid' 
-                      ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3' 
+                      ? 'grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3' 
                       : 'grid-cols-1'
                   }`}>
                     {filteredProducts.map((item, index) => (
